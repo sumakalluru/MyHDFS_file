@@ -1,0 +1,439 @@
+
+					Hadoop Distributed File System (HDFS)
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Difference b/w hdfs dfs & hadoop fs :-
+*****************************************
+>fs refers to any file system, it could be local / HDFS but dfs refers to only HDFS file system.
+>So, when we use "fs" it can perform operations with from/to local/hadoop distibuted file system to destination.
+>But specifying "dfs" operation relatets to HDFS.
+>Also, if we need to perform access/transfer data b/w different file system, fs is the way to go.
+
+----------------------------------------------------------------------------------------------------------------------------------------
+					HDFS CMNDS
+----------------------------------------------------------------------------------------------------------------------------------------
+
+1)ls :- 
+****
+To see all files under a directory / at specified path (or) to see a particular file. 
+For a directory a list of its direct children is returned.
+
+SYNTAX :
+*********
+Linux :- ls	
+Hadoop :- hadoop fs -ls / (or) hdfs dfs -ls
+_____________________________________________________________________________________________________________
+
+2)mkdir :- 
+*********
+Creates a directory in specified location.
+Folder Name : LFS	-->Local File System
+Folder Name : HDFS	-->Hadoop File System
+
+SYNTAX :
+*********
+Linux :- mkdir /home/suma/LFS	
+Hadoop :- hadoop fs -mkdir -p /usr/local/hadoop-env/HFS
+
+NOTE :-
+*******
+-p means Do not fail if the directory already exists.
+_____________________________________________________________________________________________________________
+
+3)-put / -copyFromLocal :-
+*****************************
+Copy files from LFS to HDFS.
+Copying fails if the file already exists & at that moment of time we can use " -f " option to forcefully put the file.
+
+SYNTAX :
+*********
+hdfs dfs -put <src_path> <target_path>
+hdfs dfs -copyFromLocal <src_path> <target_path>
+_____________________________________________________________________________________________________________
+
+4)-cat :-
+*******
+Fetch all files that match the file pattern & display their contents.
+
+SYNTAX :
+*********
+hdfs dfs -cat <path> =>Hadoop
+cat <path> =>Linux
+_____________________________________________________________________________________________________________
+
+5)touchz :-
+**********
+Creates a file of zero length at <path> with current time as the timestamp of that <path>.
+An error is returned if the file exists with non-zero length.
+
+SYNTAX :
+*********
+hdfs dfs -touchz <path>
+_____________________________________________________________________________________________________________
+
+6)-get / -copyToLocal :-
+*************************
+Copy files that match the file pattern <src> to the local name, <src> is kept.
+When copying multiple files, the destination must be a directory.
+
+SYNTAX :
+*********
+hdfs dfs -get <src_path> <target_path>
+hdfs dfs -copyToLocal <src_path> <target_path>
+_____________________________________________________________________________________________________________
+
+7)-appendToFile :-
+******************
+Appends(Adds) the contents of all the given src file to the given target file.
+The target file will be created if it does not exist.
+
+SYNTAX :
+*********
+hdfs dfs -appendToFile <src_path> <target_path>
+
+NOTE :-
+*******
+>If the file given in the target path already exists, then it will just appends/adds the data to it.
+>If the file given in the target path doesn't exists, then it will create that file (with the given name) & then appends/adds the data to it.
+_____________________________________________________________________________________________________________
+
+8)-rm [-skipTrash] :-
+**********************
+Delete all files that match the specified file pattern.
+
+SYNTAX :
+*********
+hdfs dfs -rm <path>
+rm <path> =>Linux
+
+Eg :-
+***
+hdfs dfs -rm /user/cloudera/file*
+From above eg, all the file names that starts with file will be dltd.
+
+NOTE :-
+*******
+>Now, enable the trash interval in core-site.xml from core-default.xml.
+Save core-site.xml & restart your hadoop cluster.
+--> stop-all.sh
+--> start-all.sh
+
+SYNTAX :
+*********
+hadoop fs -rm -skipTrash /usr/local/hadoop-env/file3.txt
+
+NOTE :-
+*******
+>The above cmnd by passes Trash & gets permanently dltd.
+>To provide permissions recursively from the directory to the held sub-directories & files.
+CMND:hdfs dfs -chmod -R 777 /user/suma/.Trash
+_____________________________________________________________________________________________________________
+
+9)-count [ -h|-q|-v ] :-
+*************************
+Counts the no.of directories, files & bytes under the paths that match the specified file pattern.
+
+Options :-
+*********
+-h = human readable format
+-q = quota
+-v = verboose
+
+SYNTAX :
+*********
+hdfs dfs -count -h -q -v <path>
+count <path> =>Linux
+_____________________________________________________________________________________________________________
+
+10)-du|-df [ -h ] :-
+********************
+Shows the capacity, free & used space of the file system.
+Here du = disk usage, df = disk free size
+
+Options :-
+*********
+-h = human readable format
+
+SYNTAX :
+*********
+hdfs dfs -du -h <path>	&	hdfs dfs -df -h <path>
+_____________________________________________________________________________________________________________
+
+11)-moveFromLocal :-
+***********************
+Same as -put, except that the src is dltd after it's copied.
+
+SYNTAX :
+*********
+hdfs dfs -moveFromLocal <src_path> <destination_path>
+
+Options :-
+*********
+-f = forcefully move the file to the target path, if the file already exist.
+
+Eg :-
+***
+hdfs dfs -moveFromLocal -f <src_path> <destination_path>
+
+>In the above eg, -f is used to forcefully move the file to the target path, if the file already exist.
+_____________________________________________________________________________________________________________
+
+12)-cp :-
+********
+Copy files that match the file pattern from src to destination.
+When copying multiple files, the destination must be a directory.
+
+SYNTAX :
+*********
+hdfs dfs -cp <src_path> <target_path>
+cp <old_filename> <new_filename> =>Linux
+
+NOTE :-
+*******
+Here cp cmnd is copy & paste
+where as mv cmnd is cut & paste & also renaming a file.
+_____________________________________________________________________________________________________________
+
+13)-mv :-
+*********
+Move files that match the specified file pattern from src to destination.
+When moving multiple files, the destination must be a directory.
+
+SYNTAX :
+*********
+hdfs dfs -mv <src_path> <target_path>
+mv <old_filename> <new_filename> =>Linux
+
+NOTE :-
+*******
+mv cmnd is used for 2ways
+1)For CUT & PASTE the file, if the file name is same & wedon't want to rename it, then mv cmnd will just move the file from src to destination.
+2)To RENAME/CHANGE the file name, if the file name should be changed then mv cmnd will move the contents in the file to the given new file name.
+_______________________________________________________________________________________________________________________
+
+14)-chmod :-
+*************
+Changes / modifies the permisions of a file.
+
+Octal represntation :-
+**********************		_
+read --> r_ _ => 4		  |
+write --> _w_ => 2	  |=> These 3 permissions for 3 people i.e, for USEER, GROUP & OTHERS
+execute --> _ _x => 1	_|
+
+Eg:- d rwx rwx rwx 
+          |_ ||_ | |_ |
+             |     |      |
+        User Group Others
+          (u)    (g)      (o)
+
+To give permissions in octal way & normal :-
+************************************************
+chmod 477 <file_name>
+chmod u+x, g-w, o+x<file_name>
+
+SYNTAX :
+*********
+hdfs dfs -chmod 777 <file_path>
+
+NOTE :-
+*******
+To provide permissions recursively from the directory to the sub-directories & files:
+hdfs dfs -chmod -R 777 /user/suma/.Trash
+_____________________________________________________________________________________________________________
+
+15)-stat [ %u|%g|%b|%r|%n|%y|%Y ] :-
+**********************************************
+Print Statistics about the file / directory at path in the specified format. 
+Format accepts file size in blocks (%b), 
+the group name of the owner (%g) &
+the file name (%n), 
+block size (%o), 
+replication (%r), 
+username of the owner (%u), 
+modification date (%y,%Y).
+
+>Here Y is epoch converter.
+
+SYNTAX :
+*********
+hdfs dfs -stat %u,%g,%n <file_path>
+_____________________________________________________________________________________________________________
+
+16)-tail [ -f ] :-
+***************
+Shows the last 1kB of the file. The -f option is used to show the apended data as the file grows.
+
+Options :-
+*********
+-f = used to show the apended data as the file grows.
+
+SYNTAX :
+*********
+hdfs dfs -tail <path>
+_____________________________________________________________________________________________________________
+
+17)-help / -usage :-
+********************
+Displays the help/usage for given cmnd / all cmnds if none is specified.
+
+SYNTAX :
+*********
+hdfs dfs -help   => shows usage for all cmnds which are available
+
+hdfs dfs -usage <cmnd_name> => displays the usage for particular cmnd along with arguments
+
+NOTE :-
+*******
+>If we specify cmnd after -help/-usage then it displays all the info. about that particular cmnd only in detail along with arguments used for that cmnd.
+>If we don't specify any cmnd after -help/-usage then it displays all cmnds details/info. 
+_____________________________________________________________________________________________________________
+
+18)-test [ -d|-e|-f|-s|-w|-r|-z ] :-
+**************************************
+Answers various qsns about path, with rslt via exit status.
+
+Options :-
+*********
+-d = to know whether it's a directory / file.
+-f =  "     "            "         "  "  file / not.
+-s = to know whether given directory / file is non-zero length.
+-z =  "     "            "         "         "  	 "   "   zero length. 
+
+SYNTAX :
+*********
+hdfs dfs -test -s <path>
+
+NOTE :-
+*******
+echo $?   => To see (or) view o/p for the above cmnd.
+_____________________________________________________________________________________________________________
+
+19)-setrep [ -w|-R ] :-
+***********************
+Sets the replication level of a file.
+If path is a directory then the cmnd recursively changes the replication factor of all files under the directory tree rooted at path.
+
+SYNTAX :
+*********
+hdfs dfs -setrep <path>
+
+hdfs dfs -setrep -w 3 <path>
+
+hdfs dfs -setrep -R 5 <path>
+
+hdfs dfs -setrep -stat %r <path>  =>To see the RF for above path.
+_____________________________________________________________________________________________________________
+
+20)-find :-
+**********
+Finds all files that match the specified expression & applies selected actions to them.
+If no path is specified then defaults to the current working directory.
+If no expression is specified then defaults to -print.
+
+SYNTAX :
+*********
+hdfs dfs -find <path> [-name/-iname] <file_name>
+>Here i = case sensitive (ignores the upper / lower case).
+_____________________________________________________________________________________________________________
+
+21)-getfacl :-
+*************
+Displays the Access Ctrl Lists(ACLs) of files & directories. 
+If a directory has a default ACL, then getfacl also displays the default ACL.
+
+SYNTAX :
+*********
+hdfs dfs -getfacl [-R] <path>
+
+hdfs dfs -getfacl -R <dir_path>
+
+hdfs dfs -getfacl <file_path> =>displays all permission on the given filefor u, g, o
+
+>The above will display the permissions for u, g, o for all files under the given directory.
+_____________________________________________________________________________________________________________
+
+22)-trucate :-
+*************
+Truncates all files that match the specified file pattern to the specified length.
+
+
+SYNTAX :
+*********
+hdfs dfs -trucate [-w] <length> <path>
+
+Eg:- hdfs dfs -trucate -w 100 <path>
+
+>The above cmnd truncates/dlts data to given length.
+_____________________________________________________________________________________________________________
+
+23)-checksum :-
+*****************
+The checksum of a file depends on its content, block size & the checksum algorithm & parameters used for creating the file.
+
+SYNTAX :
+*********
+hdfs dfs -checksum <path>
+
+NOTE :-
+*******
+It is used to validate the changes hpnd to the file by the hexadecimal value i.e, checksum value.
+If contents in the file is modified then checksum value is changed.
+_____________________________________________________________________________________________________________
+
+24)-text :-
+**********
+It displays zipped file data which cannot be seen by cat cmnd. (For eg, files like .gz which can't be seen by cat cmnd)
+
+SYNTAX :
+*********
+hdfs dfs -text <file_name>
+_____________________________________________________________________________________________________________
+
+25)-getmerge :-
+****************
+Takes the src directory & local destination file as the i/p.
+Concatenates the file in the src & puts it into the local destination file.
+Optionally we can use " -nl " to add new line character at the end of each file.
+We can use -skip-empty-file option to avoid unnecessary new line characters for empty files.
+
+SYNTAX :
+*********
+hdfs dfs -getmerge [-nl] <src> <localdest>
+
+hdfs dfs -getmerge <src_path> <dest_path>
+_____________________________________________________________________________________________________________
+
+					HDFS Admin Cmnds
+----------------------------------------------------------------------------------------------------------------------------------------
+>To see all hadoop admin cmnds : hadoop dfsadmin -help
+
+26)-report [-live] [-dead] [-decommissioning] [-enteringmaintenance] [-inmaintenance] :-
+****************************************************************************************************
+Reports basic file system info. & statistics.
+The dfs usage can be different from " du " usage, bcz it measures raw spaces used by replication, checksums, snapshots & etc. on all DNs.
+
+SYNTAX :
+*********
+hdfs dfsadmin -report /
+_____________________________________________________________________________________________________________
+
+27)-safemode <enter|leave|get|wait|forceExit> :- safe mode maintenance cmnd.
+*******************************************************
+safemode is a NN state in which it :
+1)does not accept changes to the name space (read-only)
+2)does not replicate / dlt blocks.
+
+>Safe mode is entered automatically at NN startup & leaves safe mode automatically when the configured minimum percentage of blocks 
+   satisfies the minimum replication condition.
+>Safe mode can also be enterd manually, but then it can only be turned off manually as well.
+
+SYNTAX :
+*********
+hdfs dfsadmin -safemode get
+
+NOTE :-
+*******
+Once Safe mode is ON, we cannot write into HDFS, it's a read-only state.
+_____________________________________________________________________________________________________________
+
